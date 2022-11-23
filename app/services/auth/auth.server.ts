@@ -28,7 +28,7 @@ export async function sendResetPasswordLink({ email }: { email: string }) {
 
 export async function resetPassword({ token, password }: { token: string; password: string }) {
   try {
-    const payload = decryptToken<{ id: string }>(token)
+    const payload = decryptToken<{ id: number }>(token)
     const hashedPassword = await hashPassword(password)
     const user = await db.user.update({ where: { id: payload.id }, data: { password: hashedPassword } })
     await sendPasswordChangedEmail(user)
@@ -43,7 +43,10 @@ export async function register(data: Prisma.UserCreateInput) {
   const existing = await db.user.findFirst({ where: { email } })
   if (existing) return { error: "User with these details already exists" }
   const password = await hashPassword(data.password)
-  const user = await db.user.create({ data: { ...data, password } })
+  const join_date = db.Date()
+
+  const user = await db.user.create({ data: { ...data, join_date, is_active, is_seller, signup_method_id, password } })
+
   return { user }
 }
 
@@ -59,7 +62,7 @@ const storage = createCookieSessionStorage({
   },
 })
 
-export async function createUserSession(userId: string, redirectTo: string) {
+export async function createUserSession(userId: number, redirectTo: string) {
   const session = await storage.getSession()
   session.set("userId", userId)
   return redirect(redirectTo, {
@@ -72,22 +75,17 @@ export async function createUserSession(userId: string, redirectTo: string) {
 export async function getUserIdFromSession(request: Request) {
   const session = await storage.getSession(request.headers.get("Cookie"))
   const userId = session.get("userId")
-  if (!userId || typeof userId !== "string") return null
+  if (!userId || typeof userId !== "number") return null
   return userId
 }
 
-const getSafeUser = async (id: string) => {
+const getSafeUser = async (id: number) => {
   const user = await db.user.findUnique({
     where: { id },
     select: {
       id: true,
-      firstName: true,
-      lastName: true,
-      avatar: true,
-      createdAt: true,
+      name: true,
       email: true,
-      updatedAt: true,
-      role: true,
     },
   })
   if (!user) return null

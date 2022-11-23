@@ -7,39 +7,178 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
 model User {
-  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  email     String   @unique
-  password  String
-  firstName String
-  lastName  String
-  avatar    String?
-  role      Role     @default(USER)
-  posts     Post[]
-  createdAt DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+  id                                BigInt             @id @default(autoincrement())
+  last_login                        DateTime?          @db.Timestamptz(6)
+  email                             String             @unique @db.VarChar(150)
+  name                              String             @db.VarChar(20)
+  password                          String             @db.VarChar(100)
+  address                           String             @db.VarChar(100)
+  join_date                         DateTime           @db.Timestamptz(6)
+  is_active                         Boolean
+  is_seller                         Boolean
+  signup_method_id                  BigInt?
+  is_admin                          Boolean            @default(false)
+  SignupMethod                      SignupMethod?      @relation(fields: [signup_method_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "User_signup_method_id_36ae2846_fk_SignupMethod_id")
+  Product                           Product[]
+  django_admin_log                  django_admin_log[]
+  payment_UserTopayment_consumer_id payment[]          @relation("UserTopayment_consumer_id")
+  payment_UserTopayment_seller_id   payment[]          @relation("UserTopayment_seller_id")
+
+  @@index([email], map: "User_email_667201b5_like")
+  @@index([signup_method_id], map: "User_signup_method_id_36ae2846")
 }
 
-enum PostType {
-  FUNNY
-  TECH
-  RANDOM
-  NEWS
-  SERIOUS
+model Category {
+  id      BigInt    @id @default(autoincrement())
+  name    String    @db.VarChar(30)
+  image   String?
+  Product Product[]
 }
 
-model Post {
-  id          String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title       String
-  type        PostType @default(FUNNY)
-  description String
-  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId    String   @db.Uuid
-  createdAt   DateTime @default(now()) @db.Timestamptz(6)
-  updatedAt   DateTime @default(now()) @updatedAt @db.Timestamptz(6)
+model PaymentTerm {
+  id      BigInt    @id @default(autoincrement())
+  unit    String    @db.VarChar(100)
+  Product Product[]
+}
+
+model Product {
+  id                 BigInt          @id @default(autoincrement())
+  product_group_name String          @db.VarChar(30)
+  product_name       String          @db.VarChar(30)
+  subtitle           String          @db.VarChar(50)
+  register_date      DateTime        @db.Date
+  update_date        DateTime        @db.Date
+  price              Int
+  image              String?
+  description        String
+  views              Int
+  num_of_subscribers Int
+  category_id        BigInt?
+  payment_term_id    BigInt?
+  seller_id          BigInt
+  Category           Category?       @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Product_category_id_0a9a7411_fk_Category_id")
+  PaymentTerm        PaymentTerm?    @relation(fields: [payment_term_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Product_payment_term_id_bc281469_fk_PaymentTerm_id")
+  User               User            @relation(fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "Product_seller_id_6b98bcab_fk_User_id")
+  ProductImages      ProductImages[]
+  payment            payment[]
+
+  @@index([category_id], map: "Product_category_id_0a9a7411")
+  @@index([payment_term_id], map: "Product_payment_term_id_bc281469")
+  @@index([seller_id], map: "Product_seller_id_6b98bcab")
+}
+
+model ProductImages {
+  id         BigInt   @id @default(autoincrement())
+  image      String?
+  product_id BigInt?
+  Product    Product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "ProductImages_product_id_7e324fde_fk_Product_id")
+
+  @@index([product_id], map: "ProductImages_product_id_7e324fde")
+}
+
+model SignupMethod {
+  id     BigInt @id @default(autoincrement())
+  method String @db.VarChar(10)
+  User   User[]
+}
+
+model auth_group {
+  id                     Int                      @id @default(autoincrement())
+  name                   String                   @unique @db.VarChar(150)
+  auth_group_permissions auth_group_permissions[]
+
+  @@index([name], map: "auth_group_name_a6ea08ec_like")
+}
+
+model auth_group_permissions {
+  id              BigInt          @id @default(autoincrement())
+  group_id        Int
+  permission_id   Int
+  auth_permission auth_permission @relation(fields: [permission_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_group_permissio_permission_id_84c5c92e_fk_auth_perm")
+  auth_group      auth_group      @relation(fields: [group_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_group_permissions_group_id_b120cbf9_fk_auth_group_id")
+
+  @@unique([group_id, permission_id], map: "auth_group_permissions_group_id_permission_id_0cd325b0_uniq")
+  @@index([group_id], map: "auth_group_permissions_group_id_b120cbf9")
+  @@index([permission_id], map: "auth_group_permissions_permission_id_84c5c92e")
+}
+
+model auth_permission {
+  id                     Int                      @id @default(autoincrement())
+  name                   String                   @db.VarChar(255)
+  content_type_id        Int
+  codename               String                   @db.VarChar(100)
+  django_content_type    django_content_type      @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auth_permission_content_type_id_2f476e4b_fk_django_co")
+  auth_group_permissions auth_group_permissions[]
+
+  @@unique([content_type_id, codename], map: "auth_permission_content_type_id_codename_01ab375a_uniq")
+  @@index([content_type_id], map: "auth_permission_content_type_id_2f476e4b")
+}
+
+model django_admin_log {
+  id                  Int                  @id @default(autoincrement())
+  action_time         DateTime             @db.Timestamptz(6)
+  object_id           String?
+  object_repr         String               @db.VarChar(200)
+  action_flag         Int                  @db.SmallInt
+  change_message      String
+  content_type_id     Int?
+  user_id             BigInt
+  django_content_type django_content_type? @relation(fields: [content_type_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_content_type_id_c4bce8eb_fk_django_co")
+  User                User                 @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "django_admin_log_user_id_c564eba6_fk_User_id")
+
+  @@index([content_type_id], map: "django_admin_log_content_type_id_c4bce8eb")
+  @@index([user_id], map: "django_admin_log_user_id_c564eba6")
+}
+
+model django_content_type {
+  id               Int                @id @default(autoincrement())
+  app_label        String             @db.VarChar(100)
+  model            String             @db.VarChar(100)
+  auth_permission  auth_permission[]
+  django_admin_log django_admin_log[]
+
+  @@unique([app_label, model], map: "django_content_type_app_label_model_76bd3d3b_uniq")
+}
+
+model django_migrations {
+  id      BigInt   @id @default(autoincrement())
+  app     String   @db.VarChar(255)
+  name    String   @db.VarChar(255)
+  applied DateTime @db.Timestamptz(6)
+}
+
+model django_session {
+  session_key  String   @id @db.VarChar(40)
+  session_data String
+  expire_date  DateTime @db.Timestamptz(6)
+
+  @@index([expire_date], map: "django_session_expire_date_a5c62663")
+  @@index([session_key], map: "django_session_session_key_c0390e0f_like")
+}
+
+model django_site {
+  id     Int    @id @default(autoincrement())
+  domain String @unique(map: "django_site_domain_a2e37b91_uniq") @db.VarChar(100)
+  name   String @db.VarChar(50)
+
+  @@index([domain], map: "django_site_domain_a2e37b91_like")
+}
+
+model payment {
+  id                             BigInt   @id @default(autoincrement())
+  price                          Int
+  subscription_date              DateTime @db.Date
+  expiration_date                DateTime @db.Date
+  payment_due_date               DateTime @db.Date
+  consumer_id                    BigInt?
+  product_id                     BigInt?
+  seller_id                      BigInt?
+  User_UserTopayment_consumer_id User?    @relation("UserTopayment_consumer_id", fields: [consumer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payment_consumer_id_1f8d12d4_fk_User_id")
+  Product                        Product? @relation(fields: [product_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payment_product_id_a0318346_fk_Product_id")
+  User_UserTopayment_seller_id   User?    @relation("UserTopayment_seller_id", fields: [seller_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "payment_seller_id_a7b0e715_fk_User_id")
+
+  @@index([consumer_id], map: "payment_consumer_id_1f8d12d4")
+  @@index([product_id], map: "payment_product_id_a0318346")
+  @@index([seller_id], map: "payment_seller_id_a7b0e715")
 }

@@ -24,13 +24,12 @@ export const loader = async ({ request }: LoaderArgs) => {
     where: search
       ? {
           OR: [
-            { firstName: { contains: search, mode: Prisma.QueryMode.insensitive } },
-            { lastName: { contains: search, mode: Prisma.QueryMode.insensitive } },
+            { name: { contains: search, mode: Prisma.QueryMode.insensitive } },
             { email: { contains: search, mode: Prisma.QueryMode.insensitive } },
           ],
         }
       : undefined,
-    select: { id: true, firstName: true, lastName: true, email: true, createdAt: true },
+    select: { id: true, name: true, email: true, createdAt: true },
   })
   const count = await db.user.count()
   return json({ users, count })
@@ -115,9 +114,9 @@ export default function AdminIndex() {
             )}
           />
           <Column<User>
-            sortKey="firstName"
+            sortKey="name"
             header="Name"
-            row={(user) => user.firstName + " " + user.lastName}
+            row={(user) => user.name}
           />
           <Column<User>
             sortKey="email"

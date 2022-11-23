@@ -62,7 +62,7 @@ export default function AdminLayout() {
             />
           </c.Center>
           <c.Center>
-            <c.Text>{user.firstName}</c.Text>
+            <c.Text>{user.name}</c.Text>
           </c.Center>
           <Form action="/logout" method="post">
             <c.Button type="submit" w="100%" variant="outline" size="sm">

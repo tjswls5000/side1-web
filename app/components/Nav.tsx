@@ -75,7 +75,7 @@ export function Nav(props: Props) {
                   boxSize="35px"
                   bg="purple.50"
                   src={createImageUrl(props.user.avatar)}
-                  name={props.user.firstName}
+                  name={props.user.name}
                 />
               ) : (
                 <c.Box as={GiHamburgerMenu} />

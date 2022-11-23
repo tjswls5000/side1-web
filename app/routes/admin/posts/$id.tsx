@@ -33,7 +33,7 @@ export default function PostDetail() {
           <c.Text>{post.description}</c.Text>
         </c.Stack>
         {post.author.avatar && (
-          <c.Avatar size="xl" src={createImageUrl(post.author.avatar)} name={post.author.firstName} />
+          <c.Avatar size="xl" src={createImageUrl(post.author.avatar)} name={post.author.name} />
         )}
       </c.Flex>
     </c.Box>

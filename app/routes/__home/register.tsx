@@ -14,13 +14,22 @@ export const loader = async ({ request }: LoaderArgs) => {
   return {}
 }
 
+
+// {
+//   "email" : "psb6604@gmail.com",
+//   "password" : "1234",
+//   "name": "야채좋아",
+//   "address": "판매자의주소",
+//   "signup_method": 1, 
+//   "is_seller": 1
+//   }
 export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData()
   const registerSchema = z.object({
     email: z.string().min(3).email("Invalid email"),
     password: z.string().min(8, "Must be at least 8 characters"),
-    firstName: z.string().min(2, "Must be at least 2 characters"),
-    lastName: z.string().min(2, "Must be at least 2 characters"),
+    name: z.string().min(2, "Must be at least 2 characters"),
+    address: z.string().max(100, "100자 이하로 입력")
   })
   const { data, fieldErrors } = await validateFormData(registerSchema, formData)
   if (fieldErrors) return badRequest({ fieldErrors, data })
@@ -42,8 +51,10 @@ export default function Register() {
             <c.Heading as="h1">Register</c.Heading>
             <FormField isRequired label="Email address" name="email" placeholder="jim@gmail.com" />
             <FormField isRequired label="Password" name="password" type="password" placeholder="********" />
-            <FormField isRequired label="First name" name="firstName" placeholder="Jim" />
-            <FormField isRequired label="Last name" name="lastName" placeholder="Bob" />
+            <FormField isRequired label="Name" name="name" placeholder="Jim" />
+            <FormField isRequired label="address" name="address" placeholder="Jim" />
+            <FormField hidden label={""} name="signup_method" />
+            <FormField hidden label={""} name="is_seller" />
             <c.Box>
               <c.Button
                 colorScheme="purple"

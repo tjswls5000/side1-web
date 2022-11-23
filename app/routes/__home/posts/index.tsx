@@ -26,7 +26,7 @@ const getPosts = async () => {
       title: true,
       description: true,
       createdAt: true,
-      author: { select: { firstName: true, avatar: true } },
+      author: { select: { name: true, avatar: true } },
     },
   })
   const count = await db.user.count()
@@ -54,7 +54,7 @@ export default function Posts() {
               <TileFooter>
                 <c.Flex justify="flex-end">
                   <c.HStack>
-                    <Avatar size="sm" src={createImageUrl(post.author.avatar)} name={post.author.firstName} />
+                    <Avatar size="sm" src={createImageUrl(post.author.avatar)} name={post.author.name} />
                     <c.Text>{dayjs(post.createdAt).fromNow()}</c.Text>
                   </c.HStack>
                 </c.Flex>

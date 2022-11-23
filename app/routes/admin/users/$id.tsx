@@ -10,7 +10,7 @@ export const loader = async ({ params: { id } }: LoaderArgs) => {
   if (!id) throw badRequest("ID required")
   const user = await db.user.findUnique({
     where: { id },
-    select: { id: true, avatar: true, firstName: true, email: true },
+    select: { id: true, avatar: true, name: true, email: true },
   })
   if (!user) throw notFound("User not Found")
   return json({ user })
@@ -22,10 +22,10 @@ export default function UserDetail() {
     <Box>
       <Flex justify="space-between">
         <Stack>
-          <Heading fontWeight={800}>{user.firstName}</Heading>
+          <Heading fontWeight={800}>{user.name}</Heading>
           <Text>{user.email}</Text>
         </Stack>
-        {user.avatar && <Avatar size="xl" src={createImageUrl(user.avatar)} name={user.firstName} />}
+        {user.avatar && <Avatar size="xl" src={createImageUrl(user.avatar)} name={user.name} />}
       </Flex>
     </Box>
   )

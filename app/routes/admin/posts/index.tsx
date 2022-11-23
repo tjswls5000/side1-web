@@ -25,15 +25,14 @@ export const loader = async ({ request }: LoaderArgs) => {
           OR: [
             { title: { contains: search, mode: Prisma.QueryMode.insensitive } },
             { description: { contains: search, mode: Prisma.QueryMode.insensitive } },
-            { author: { firstName: { contains: search, mode: Prisma.QueryMode.insensitive } } },
-            { author: { lastName: { contains: search, mode: Prisma.QueryMode.insensitive } } },
+            { author: { name: { contains: search, mode: Prisma.QueryMode.insensitive } } },
           ],
         }
       : undefined,
     select: {
       id: true,
       title: true,
-      author: { select: { id: true, avatar: true, firstName: true, lastName: true } },
+      author: { select: { id: true, avatar: true, name: true } },
       createdAt: true,
     },
   })
@@ -65,10 +64,10 @@ export default function Posts() {
         >
           <Column<Post> sortKey="title" header="Title" row={(post) => post.title} />
           <Column<Post>
-            sortKey="author.firstName"
+            sortKey="author.name"
             display={{ base: "none", md: "flex" }}
             header="Author"
-            row={(post) => post.author.firstName + " " + post.author.lastName}
+            row={(post) => post.author.name}
           />
           <Column<Post>
             sortKey="createdAt"

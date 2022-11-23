@@ -18,7 +18,7 @@ export const loader = async ({ params: { id } }: LoaderArgs) => {
       title: true,
       type: true,
       description: true,
-      author: { select: { firstName: true, avatar: true } },
+      author: { select: { name: true, avatar: true } },
     },
   })
   if (!post) throw notFound("Post not Found")
@@ -41,8 +41,8 @@ export default function PostDetail() {
       </c.Stack>
       {post.author.avatar && (
         <c.HStack>
-          <c.Avatar size="sm" src={createImageUrl(post.author.avatar)} name={post.author.firstName} />
-          <c.Text>{post.author.firstName}</c.Text>
+          <c.Avatar size="sm" src={createImageUrl(post.author.avatar)} name={post.author.name} />
+          <c.Text>{post.author.name}</c.Text>
         </c.HStack>
       )}
     </c.Stack>

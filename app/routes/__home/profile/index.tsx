@@ -31,8 +31,7 @@ export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData()
   const updateSchema = z.object({
     email: z.string().min(3).email("Invalid email").optional(),
-    firstName: z.string().min(2, "Must be at least 2 characters").optional(),
-    lastName: z.string().min(2, "Must be at least 2 characters").optional(),
+    name: z.string().min(2, "Must be at least 2 characters").optional(),
     avatar: z.string().nullable().optional(),
   })
   const { data, fieldErrors } = await validateFormData(updateSchema, formData)
@@ -78,8 +77,8 @@ export default function Profile() {
         onChange={(e) => {
           const formData = new FormData(e.currentTarget)
           const data = Object.fromEntries(formData) as Record<string, string>
-          const { firstName, lastName, email } = user
-          const isDirty = !shallowEqual({ firstName, lastName, email }, data)
+          const { name, email } = user
+          const isDirty = !shallowEqual({ name, email }, data)
           setIsDirty(isDirty)
         }}
       >
@@ -96,12 +95,11 @@ export default function Profile() {
                 placeholder="jim@gmail.com"
               />
               <FormField
-                label="First name"
-                defaultValue={user.firstName}
-                name="firstName"
+                label="Name"
+                defaultValue={user.name}
+                name="name"
                 placeholder="Jim"
               />
-              <FormField label="Last name" defaultValue={user.lastName} name="lastName" placeholder="Sebe" />
               <FormError />
             </c.Stack>
           </TileBody>
