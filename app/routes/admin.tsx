@@ -2,18 +2,33 @@ import * as React from "react"
 import { BiMoon, BiSun } from "react-icons/bi"
 import { CgAlbum, CgExternal, CgFileDocument, CgHome, CgUser } from "react-icons/cg"
 import * as c from "@chakra-ui/react"
-import { Role } from "@prisma/client"
-import { json, LoaderArgs } from "@remix-run/node"
+// import { Role } from "@prisma/client"
+import { json, LoaderFunction } from "@remix-run/node"
 import { Form, NavLink, Outlet, useLoaderData } from "@remix-run/react"
 
-import type { CurrentUser } from "~/services/auth/auth.server"
-import { getCurrentUser, requireUser } from "~/services/auth/auth.server"
+import { CurrentUser, getUser } from "~/models/user.server"
+import authenticated from "~/services/auth/authenticated.server"
 
-export const loader = async ({ request }: LoaderArgs) => {
-  await requireUser(request)
-  const user = await getCurrentUser(request)
-  return json(user)
-}
+// export const loader = async ({ request }: LoaderArgs) => {
+//   await requireUser(request)
+//   const user = await getUser(request)
+//   return json(user)
+// }
+
+export const loader: LoaderFunction = async ({ request }) => {
+  
+  const success = async () => {
+    const user = await getUser(request);
+
+    return json(user);
+  };
+
+  const failure = () => {
+    return json(null);
+  };
+
+  return authenticated(request, success, failure);
+};
 
 export default function AdminLayout() {
   const user = useLoaderData<CurrentUser>()
@@ -43,13 +58,8 @@ export default function AdminLayout() {
           <SidebarLink to="." end icon={<c.Box boxSize="18px" as={CgAlbum} />}>
             Dashboard
           </SidebarLink>
-          {user.role === Role.ADMIN && (
-            <SidebarLink to="users" icon={<c.Box boxSize="18px" as={CgUser} />}>
-              Users
-            </SidebarLink>
-          )}
-          <SidebarLink to="posts" icon={<c.Box boxSize="18px" as={CgFileDocument} />}>
-            Posts
+          <SidebarLink to="Products" icon={<c.Box boxSize="18px" as={CgFileDocument} />}>
+            Products
           </SidebarLink>
         </c.Stack>
         <c.Stack>

@@ -1,31 +1,41 @@
 import * as c from "@chakra-ui/react"
-import { ActionArgs, LoaderArgs, redirect } from "@remix-run/node"
+import { ActionFunction, LoaderFunction, redirect } from "@remix-run/node"
 import { Link, useSearchParams, useTransition } from "@remix-run/react"
 import { z } from "zod"
 
 import { Form, FormError, FormField } from "~/components/Form"
 import { validateFormData } from "~/lib/form"
 import { badRequest } from "~/lib/remix"
-import { createUserSession, getUser, login } from "~/services/auth/auth.server"
+import { createAuthSession } from "~/services/auth/session.server"
+import { getUser } from "~/models/user.server"
+import { login } from "~/services/auth/auth.server"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader: LoaderFunction = async ({ request }:) => {
   const user = await getUser(request)
   if (user) return redirect("/")
   return null
 }
 
-export const action = async ({ request }: ActionArgs) => {
+export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
+  const redirectTo = formData.get("redirectTo") || "/"
+
   const loginSchema = z.object({
     email: z.string().min(3).email("Invalid email"),
     password: z.string().min(8, "Must be at least 8 characters"),
   })
+
   const { data, fieldErrors } = await validateFormData(loginSchema, formData)
   if (fieldErrors) return badRequest({ fieldErrors, data })
-  const { error, user } = await login(data)
-  if (error || !user) return badRequest({ data, formError: error })
-  const redirectTo = formData.get("redirectTo") || "/"
-  return createUserSession(user.id, redirectTo as string)
+
+  const tokens = await login(data)
+  if (!tokens) {
+    return badRequest({
+      formError: `email/Password combination is incorrect`,
+    });
+  }
+  const { accessToken, refreshToken } = tokens;
+  return createAuthSession(accessToken, refreshToken, redirectTo as string);
 }
 
 export default function Login() {

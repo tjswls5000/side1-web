@@ -10,7 +10,7 @@ export default function Home() {
         <c.Heading as="h1" mb={4} textAlign="center">
           Welcome to the Boilerplate
         </c.Heading>
-        <LinkButton to="posts">See posts</LinkButton>
+        <LinkButton to="Products">See Products</LinkButton>
       </c.VStack>
     </Limiter>
   )

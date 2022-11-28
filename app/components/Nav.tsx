@@ -3,14 +3,15 @@ import { GiHamburgerMenu } from "react-icons/gi"
 import * as c from "@chakra-ui/react"
 import { Link, useSubmit } from "@remix-run/react"
 
-import { createImageUrl } from "~/lib/s3"
-import type { CurrentUserJson } from "~/services/auth/auth.server"
+// import { createImageUrl } from "~/lib/s3"
 
 import { Limiter } from "./Limiter"
 import { LinkButton } from "./LinkButton"
+import { User } from "@prisma/client"
+import { CurrentUserName } from "~/models/user.server"
 
 interface Props {
-  user: CurrentUserJson | null
+  user: CurrentUserName | null
 }
 export function Nav(props: Props) {
   const submit = useSubmit()
@@ -39,9 +40,8 @@ export function Nav(props: Props) {
         {/* Left link list */}
         <c.HStack spacing={8}>
           <c.Link fontWeight="bold" as={Link} to="/">
-            Boilerplate
+            모아구독
           </c.Link>
-          <Link to="/posts">Posts</Link>
         </c.HStack>
 
         {/* Right link list */}
@@ -74,7 +74,7 @@ export function Nav(props: Props) {
                   color="black"
                   boxSize="35px"
                   bg="purple.50"
-                  src={createImageUrl(props.user.avatar)}
+                  src="https://d15f34w2p8l1cc.cloudfront.net/hearthstone/04f991b6a56263b712f7f757069a01029780a6e97bbdc886e9e51ca5e04fc5b6.png"// 센진 방패대가
                   name={props.user.name}
                 />
               ) : (
@@ -86,9 +86,9 @@ export function Nav(props: Props) {
           <c.MenuList fontSize="md">
             {props.user ? (
               <>
-                <Link to="/profile">
+                {/* <Link to="/profile">
                   <c.MenuItem icon={<c.Box as={BiUser} boxSize="16px" />}>Profile</c.MenuItem>
-                </Link>
+                </Link> */}
 
                 <Link to="/admin">
                   <c.MenuItem icon={<c.Box as={BiCog} boxSize="16px" />}>Admin</c.MenuItem>

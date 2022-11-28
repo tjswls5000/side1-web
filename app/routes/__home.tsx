@@ -1,12 +1,12 @@
 import { Box } from "@chakra-ui/react"
-import { json, LoaderArgs } from "@remix-run/node"
+import { json, LoaderFunction } from "@remix-run/node"
 import { Outlet, useLoaderData } from "@remix-run/react"
 
 import { Limiter } from "~/components/Limiter"
 import { Nav } from "~/components/Nav"
-import { getUser } from "~/services/auth/auth.server"
+import { getUser } from "~/models/user.server"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader: LoaderFunction = async ({ request }) => {
   const user = await getUser(request)
   return json(user)
 }

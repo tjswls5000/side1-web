@@ -14,7 +14,7 @@ model User {
   name                              String             @db.VarChar(20)
   password                          String             @db.VarChar(100)
   address                           String             @db.VarChar(100)
-  join_date                         DateTime           @db.Timestamptz(6)
+  join_date                         DateTime           @default(now()) @db.Timestamptz(6)
   is_active                         Boolean
   is_seller                         Boolean
   signup_method_id                  BigInt?

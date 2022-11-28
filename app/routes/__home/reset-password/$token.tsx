@@ -1,5 +1,5 @@
 import * as c from "@chakra-ui/react"
-import { ActionArgs, redirect } from "@remix-run/node"
+import { ActionFunction, redirect } from "@remix-run/node"
 import { Link, useParams, useTransition } from "@remix-run/react"
 import { z } from "zod"
 
@@ -8,7 +8,7 @@ import { validateFormData } from "~/lib/form"
 import { badRequest } from "~/lib/remix"
 import { resetPassword } from "~/services/auth/auth.server"
 
-export const action = async ({ request }: ActionArgs) => {
+export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
   const resetPasswordSchema = z.object({
     token: z.string(),
