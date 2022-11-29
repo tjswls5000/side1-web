@@ -195,12 +195,12 @@ export async function register({
 
 export async function login({ email, password }: LoginForm) {
   try {
-    const response = await fetch(`${process.env.API_URL}/auth/login`, {
+    const response = await fetch(`${process.env.API_URL}/user/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, is_seller: 1 }),
     });
 
     const data = await response.json();

@@ -10,7 +10,7 @@ import { createAuthSession } from "~/services/auth/session.server"
 import { getUser } from "~/models/user.server"
 import { login } from "~/services/auth/auth.server"
 
-export const loader: LoaderFunction = async ({ request }:) => {
+export const loader: LoaderFunction = async ({ request }) => {
   const user = await getUser(request)
   if (user) return redirect("/")
   return null

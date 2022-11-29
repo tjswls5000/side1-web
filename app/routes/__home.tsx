@@ -1,4 +1,5 @@
 import { Box } from "@chakra-ui/react"
+import { User } from "@prisma/client"
 import { json, LoaderFunction } from "@remix-run/node"
 import { Outlet, useLoaderData } from "@remix-run/react"
 
@@ -12,7 +13,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 }
 
 export default function HomeLayout() {
-  const user = useLoaderData<typeof loader>()
+  const user = useLoaderData<User>()
   return (
     <Box>
       <Nav user={user} />

@@ -1,10 +1,11 @@
-import * as React from "react"
-import { hydrate } from "react-dom"
+import { startTransition, StrictMode } from "react";
+import { hydrateRoot } from "react-dom/client";
 import { CacheProvider } from "@emotion/react"
 import { RemixBrowser } from "@remix-run/react"
 
 import { ClientStyleContext } from "~/lib/emotion/context"
 import { createEmotionCache } from "~/lib/emotion/createEmotionCache"
+import React from "react";
 
 interface ClientCacheProviderProps {
   children: React.ReactNode
@@ -24,9 +25,13 @@ function ClientCacheProvider({ children }: ClientCacheProviderProps) {
   )
 }
 
-hydrate(
-  <ClientCacheProvider>
-    <RemixBrowser />
-  </ClientCacheProvider>,
-  document,
-)
+function hydrate() {
+  startTransition(() => {
+    hydrateRoot(
+      document,
+      <ClientCacheProvider>
+        <RemixBrowser />
+      </ClientCacheProvider>
+    );
+  });
+}

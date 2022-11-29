@@ -4,7 +4,7 @@ import { db } from "~/lib/db.server"
 import { logout } from "~/services/auth/auth.server";
 import { getAccessToken } from "~/services/auth/jwt.server";
 
-export async function getProduct(request: Request, filtering: string, page: number, group_name: string): Promise<ProductJson | null> {
+export async function getProducts(request: Request, filtering: string, page: number, group_name: string): Promise<ProductJson | null> {
   const accessToken = await getAccessToken(request);
 
   if (!accessToken) {

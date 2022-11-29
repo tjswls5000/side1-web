@@ -1,8 +1,8 @@
 import * as React from "react"
 import * as c from "@chakra-ui/react"
-import { Product } from "@prisma/client"
-import { ActionFunction, LoaderFunction, redirect } from "@remix-run/node"
-import { useTransition } from "@remix-run/react"
+import { Category, Product } from "@prisma/client"
+import { ActionFunction, json, LoaderFunction, redirect } from "@remix-run/node"
+import { useLoaderData, useTransition } from "@remix-run/react"
 import { z } from "zod"
 
 import { Form, FormError, FormField } from "~/components/Form"
@@ -14,27 +14,19 @@ import { getUser } from "~/models/user.server"
 import { createProduct } from "~/models/products.server"
 import authenticated from "~/services/auth/authenticated.server"
 
+type LoaderData = { categories: Category[] };//  | undefined 
+
 export const loader: LoaderFunction = async ({ request }) => {
   // const { search, ...tableParams } = getTableParams(request, TAKE, DEFAULT_ORDER)
 
-  const success = async () => {
-    // 초기 화면 로드
-    const category = await db.category.findMany()
-    return category;
+  const categories = await db.category.findMany()
+  
+  return json<LoaderData>({ categories });
   };
-
-  const failure = () => {
-    return json<ProductJson>({
-      
-    });
-  };
-
-  return authenticated(request, success, failure);
-}
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
-  const postSchema = z
+  const productSchema = z
     .object({
       category_id: z.number(),
       product_group_name: z.string().min(1, { message: "Required" }),
@@ -47,7 +39,7 @@ export const action: ActionFunction = async ({ request }) => {
     })
     .array()
 
-  const { data, fieldErrors } = await validateFormData(postSchema, formData)
+  const { data, fieldErrors } = await validateFormData(productSchema, formData)
   const user = await getUser(request)
   if (fieldErrors) return badRequest({ fieldErrors, data })
   //const post = await db.post.create({ data: { ...data, author: { connect: { id: user.id } } } })
@@ -55,7 +47,8 @@ export const action: ActionFunction = async ({ request }) => {
   return redirect(`/admin/product`)
 }
 
-export default function NewPost() {
+export default function NewProduct() {
+  const { categories } = useLoaderData<LoaderData>()
   const [isDirty, setIsDirty] = React.useState(false)
   const { state } = useTransition()
   const isSubmitting = state === "submitting"
@@ -100,7 +93,7 @@ export default function NewPost() {
   return (
     <c.Stack spacing={4}>
       <c.Flex justify="space-between">
-        <c.Heading>New post</c.Heading>
+        <c.Heading>New product</c.Heading>
       </c.Flex>
 
       <Form
@@ -118,15 +111,18 @@ export default function NewPost() {
           </TileHeader>
           <TileBody>
             <c.Stack spacing={4}>
-              <FormField name="title" label="Title" placeholder="My post" min={1} />
+              <FormField name="title" label="Title" placeholder="My product" min={1} />
               <FormField name="description" label="Description" input={<c.Textarea rows={6} />} />
               <FormField
                 name="category_id"
                 label="Category"
                 input={
-                  <c.Select placeholder='Select country'>
-                    <option value={data.id}>United Arab Emirates</option>
-                    <option>Nigeria</option>
+                  <c.Select placeholder='Select category'>
+                    {categories.map(({ id, name }) => (
+                      <option value={id} key={id}>
+                        {name}
+                      </option>
+                    ))}
                   </c.Select>
                 }
               />

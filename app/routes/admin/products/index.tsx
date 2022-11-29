@@ -12,7 +12,8 @@ import { Column, Table } from "~/components/Table"
 import { Tile } from "~/components/Tile"
 import { db } from "~/lib/db.server"
 import { getTableParams } from "~/lib/table"
-import { getProduct, ProductJson, SellersProducts } from "~/models/products.server"
+import { getProducts, ProductJson, SellersProducts } from "~/models/products.server"
+import { getUser } from "~/models/user.server"
 import authenticated from "~/services/auth/authenticated.server"
 
 const TAKE = 10
@@ -51,34 +52,32 @@ const DEFAULT_ORDER = { orderBy: "createdAt", order: Prisma.SortOrder.desc }
 //   "category": 1,
 //   "payment_term": 3
 //   },
-//    "total_page": 2, 
+//   ],
+//   "total_page": 2, 
 //   "is_grouped": false
 // }
-// type LoaderData = {
-//   user: User | null;
-//   productList: Joke[] | null;
-// };
+
 type LoaderData = {
   user: User | null;
-  productList: Product[] | null;
+  products: ProductJson | null;
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const productList = await getProduct(request, "", 1, "");
+  const products = await getProducts(request, "subscribers", 1, "");
 
   const success = async () => {
     const user = await getUser(request);
 
     return json<LoaderData>({
       user,
-      productList,
+      products
     });
   };
 
   const failure = () => {
     return json<LoaderData>({
       user: null,
-      productList,
+      products: null
     });
   };
 
@@ -86,7 +85,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 };
 
 export default function Products() {
-  const { sellers_products } = useLoaderData<typeof loader>()
+  const { user, products } = useLoaderData<typeof loader>()
   return (
     <c.Stack spacing={4}>
       <c.Flex justify="space-between">
@@ -106,9 +105,7 @@ export default function Products() {
             <c.Stack mt='6' spacing='3'>
               <c.Heading size='md'>Living room Sofa</c.Heading>
               <c.Text>
-                This sofa is perfect for modern tropical spaces, baroque inspired
-                spaces, earthy toned spaces and for people who love a chic design with a
-                sprinkle of vintage design.
+                {products.sellers_products}
               </c.Text>
               <c.Text color='blue.600' fontSize='2xl'>
                 $450
