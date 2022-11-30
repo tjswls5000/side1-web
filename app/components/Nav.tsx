@@ -8,10 +8,10 @@ import { Link, useSubmit } from "@remix-run/react"
 import { Limiter } from "./Limiter"
 import { LinkButton } from "./LinkButton"
 import { User } from "@prisma/client"
-import { CurrentUserName } from "~/models/user.server"
+import { CurrentUserJson } from "~/models/user.server"
 
 interface Props {
-  user: CurrentUserName | null
+  user: CurrentUserJson | null
 }
 export function Nav(props: Props) {
   const submit = useSubmit()

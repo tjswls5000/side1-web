@@ -12,7 +12,7 @@ import { getAccessToken } from "~/services/auth/jwt.server";
 //   return { user }
 // }
 
-export async function getUser(request: Request): Promise<User | null> {
+export async function getUser(request: Request): Promise<CurrentUserJson | null> {
   const accessToken = await getAccessToken(request);
 
   if (!accessToken) {
@@ -34,4 +34,4 @@ export async function getUser(request: Request): Promise<User | null> {
 }
 
 export type CurrentUser = Omit<User, "password">
-export type CurrentUserName = Pick<User, "name">
+export type CurrentUserJson = Pick<User, "id" | "email" | "name" | "address" | "is_active" | "is_seller"> & {sub_product: number[]}

@@ -3,10 +3,10 @@ import { Session } from "@remix-run/node";
 import { authSessionStorage } from "./session.server";
 import { logout } from "./auth.server";
 
-const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-if (!accessTokenSecret) {
-  throw new Error("ACCESS_TOKEN_SECRET must be set");
-}
+// const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+// if (!accessTokenSecret) {
+//   throw new Error("ACCESS_TOKEN_SECRET must be set");
+// }
 
 type Tokens = {
   accessToken?: string;
@@ -22,19 +22,21 @@ export async function getAccessToken(request: Request): Promise<string | null> {
   const accessToken = session.get("accessToken");
 
   if (!accessToken) {
+    console.log("getAccessToken !accessToken");
     throw logout(request);
   }
+  return accessToken
 
-  if (!accessTokenSecret) {
-    throw new Error("ACCESS_TOKEN_SECRET must be set");
-  }
+  // if (!accessTokenSecret) {
+  //   throw new Error("ACCESS_TOKEN_SECRET must be set");
+  // }
 
-  try {
-    jwt.verify(accessToken, accessTokenSecret);
-    return accessToken;
-  } catch {
-    return null;
-  }
+  // try {
+  //   jwt.verify(accessToken, accessTokenSecret);
+  //   return accessToken;
+  // } catch {
+  //   return null;
+  // }
 }
 
 export async function refreshAccessToken(session: Session): Promise<Tokens> {

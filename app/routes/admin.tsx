@@ -24,7 +24,8 @@ export const loader: LoaderFunction = async ({ request }) => {
   };
 
   const failure = () => {
-    return json(null);
+    // login으로 되돌려도? 좋을듯 return redirect("/login")
+    throw new Response("Not authorized.", { status: 401 });
   };
 
   return authenticated(request, success, failure);

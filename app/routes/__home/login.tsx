@@ -11,24 +11,28 @@ import { getUser } from "~/models/user.server"
 import { login } from "~/services/auth/auth.server"
 
 export const loader: LoaderFunction = async ({ request }) => {
-  const user = await getUser(request)
-  if (user) return redirect("/")
+  console.log("login loader");
+  
   return null
 }
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
-  const redirectTo = formData.get("redirectTo") || "/"
+  const redirectTo = formData.get("redirectTo") || "/admin"
 
   const loginSchema = z.object({
     email: z.string().min(3).email("Invalid email"),
-    password: z.string().min(8, "Must be at least 8 characters"),
+    password: z.string().min(4, "Must be at least 4 characters"),
   })
 
   const { data, fieldErrors } = await validateFormData(loginSchema, formData)
   if (fieldErrors) return badRequest({ fieldErrors, data })
 
-  const tokens = await login(data)
+  console.log("sEEEEEEEF");
+  
+    const tokens = await login({...data, is_seller: 1})
+    console.log("token: ", tokens);
+    
   if (!tokens) {
     return badRequest({
       formError: `email/Password combination is incorrect`,
@@ -49,8 +53,8 @@ export default function Login() {
           <c.Stack spacing={3}>
             <c.Heading as="h1">Login</c.Heading>
             <input type="hidden" name="redirectTo" value={searchParams.get("redirectTo") ?? undefined} />
-            <FormField isRequired label="Email address" name="email" placeholder="jim@gmail.com" />
-            <FormField isRequired label="Password" name="password" type="password" placeholder="********" />
+            <FormField isRequired label="Email address" name="email" />
+            <FormField isRequired label="Password" name="password" type="password" />
             <c.Box>
               <c.Button
                 colorScheme="purple"
