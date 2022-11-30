@@ -10,14 +10,6 @@ import { sendPasswordChangedEmail, sendResetPasswordEmail } from "../user/user.m
 import { comparePasswords, hashPassword } from "./password.server"
 import { authSessionStorage } from "./session.server"
 
-// export async function login({ email, password }: { email: string; password: string }) {
-//   const user = await db.user.findUnique({ where: { email } })
-//   if (!user) return { error: "Incorrect email or password" }
-//   const isCorrectPassword = await comparePasswords(password, user.password)
-//   if (!isCorrectPassword) return { error: "Incorrect email or password" }
-//   return { user }
-// }
-
 export async function sendResetPasswordLink({ email }: { email: string }) {
   const user = await db.user.findUnique({ where: { email } })
   if (user) {
@@ -142,6 +134,7 @@ export async function resetPassword({ token, password }: { token: string; passwo
 type LoginForm = {
   email: string;
   password: string;
+  is_seller: number
 };
 
 type RegisterForm = {
@@ -193,14 +186,16 @@ export async function register({
   }
 }
 
-export async function login({ email, password }: LoginForm) {
+export async function login({ email, password, is_seller }: LoginForm) {
   try {
-    const response = await fetch(`${process.env.API_URL}/user/login`, {
+    console.log("body", JSON.stringify({ email, password, is_seller }));
+    
+    const response = await fetch(`http://54.180.145.47:10000/user/login`, {// ${process.env.API_URL}:10000/user/login
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password, is_seller: 1 }),
+      body: JSON.stringify({ email, password, is_seller }),
     });
 
     const data = await response.json();
@@ -218,6 +213,8 @@ export async function login({ email, password }: LoginForm) {
 }
 
 export async function logout(request: Request) {
+  console.log("logout");
+  
   const session = await authSessionStorage.getSession(
     request.headers.get("Cookie")
   );
