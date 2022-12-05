@@ -3,7 +3,7 @@ import { BiMoon, BiSun } from "react-icons/bi"
 import { CgAlbum, CgExternal, CgFileDocument, CgHome, CgUser } from "react-icons/cg"
 import * as c from "@chakra-ui/react"
 // import { Role } from "@prisma/client"
-import { json, LoaderFunction } from "@remix-run/node"
+import { json, LoaderFunction, redirect } from "@remix-run/node"
 import { Form, NavLink, Outlet, useLoaderData } from "@remix-run/react"
 
 import { CurrentUser, getUser } from "~/models/user.server"
@@ -24,8 +24,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   };
 
   const failure = () => {
-    // login으로 되돌려도? 좋을듯 return redirect("/login")
-    throw new Response("Not authorized.", { status: 401 });
+    // login으로 되돌려도? 좋을듯 
+    return redirect("/login")
+    // throw new Response("Not authorized.", { status: 401 });
   };
 
   return authenticated(request, success, failure);
@@ -64,14 +65,14 @@ export default function AdminLayout() {
           </SidebarLink>
         </c.Stack>
         <c.Stack>
-          <c.Center>
+          {/* <c.Center>
             <c.IconButton
               aria-label={`Switch to ${isDark ? "light" : "dark"} mode`}
               variant="ghost"
               onClick={toggleColorMode}
               icon={<c.Box as={isDark ? BiSun : BiMoon} boxSize="20px" />}
             />
-          </c.Center>
+          </c.Center> */}
           <c.Center>
             <c.Text>{user.name}</c.Text>
           </c.Center>

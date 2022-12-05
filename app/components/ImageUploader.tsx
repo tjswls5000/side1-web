@@ -9,6 +9,7 @@ import { ButtonGroup } from "./ButtonGroup"
 import { Modal } from "./Modal"
 
 interface Props {
+  children: string
   path: string
   onSubmit: (key: string) => Promise<any> | any
   dropzoneOptions?: Omit<DropzoneOptions, "multiple" | "onDrop">

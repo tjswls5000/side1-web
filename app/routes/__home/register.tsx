@@ -10,18 +10,18 @@ import { getUser } from "~/models/user.server"
 import { register } from "~/services/auth/auth.server"
 import { createAuthSession } from "~/services/auth/session.server"
 
-export const loader: LoaderFunction = async ({ request }) => {
-  const user = await getUser(request)
-  if (user) return redirect("/")
-  return {}
-}
+// export const loader: LoaderFunction = async ({ request }) => {
+//   const user = await getUser(request)
+//   if (user) return redirect("/admin")
+//   return {}
+// }
 
 // {
 //   "email" : "psb6604@gmail.com",
 //   "password" : "1234",
 //   "name": "야채좋아",
 //   "address": "판매자의주소",
-//   "signup_method": 1, 
+//   "signup_method_id": 1, 
 //   "is_seller": 1
 //   }
 export const action: ActionFunction  = async ({ request }) => {
@@ -38,10 +38,15 @@ export const action: ActionFunction  = async ({ request }) => {
 
   //join_date is_seller is_active
   
-  const { tokens, error } = await register(data);
-  if (tokens) {
-    const { accessToken, refreshToken } = tokens;
-    return createAuthSession(accessToken, refreshToken, "/admin");
+  // 회원등록 함수 리턴값 확인 후 처리하기
+  const { user, error } = await register(data);
+  
+  //const { user, error } = await register(data);
+  
+  if (user) {
+    //const { email, password } = user;
+    // return createAuthSession(accessToken, refreshToken, "/admin");
+    return redirect("/login")
   } else {
     return badRequest({
       formError: error || `email/Password combination is incorrect`,

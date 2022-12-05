@@ -20,13 +20,13 @@ export async function getUser(request: Request): Promise<CurrentUserJson | null>
   }
 
   try {
-    const response = await fetch(`${process.env.API_URL}/user`, {
+    const response = await fetch(`${process.env.API_URL}:10000/user`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
     });
-    const { user } = await response.json();
-    return user;
+    const data = await response.json();
+    return data;
   } catch (error) {
     console.error("getUser error", error);
     return null;

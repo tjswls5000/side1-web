@@ -3,22 +3,29 @@ import type { Prisma, Product } from "@prisma/client"
 import { db } from "~/lib/db.server"
 import { logout } from "~/services/auth/auth.server";
 import { getAccessToken } from "~/services/auth/jwt.server";
+import { getUser } from "./user.server";
 
-export async function getProducts(request: Request, filtering: string, page: number, group_name: string): Promise<ProductJson | null> {
+export async function getProducts(request: Request, page: number, filter: string ): Promise<ProductJson | null> {
   const accessToken = await getAccessToken(request);
 
   if (!accessToken) {
     return null;
   }
-  // seller/product?filtering={recent or views or subscribers }&page=1 + &group_name=돼지 좋아
+  // http://54.180.145.47:8002/seller/product/20?page=1&filter=views
   try {
-    const response = await fetch(`${process.env.API_URL}/seller/product/?filtering=${filtering}&page=${page}+&group_name=${group_name}`, {
+    const user = await getUser(request)
+    const response = await fetch(`${process.env.API_URL}:8002/seller/product/${user?.id}?page=${page}&filter=${filter}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
-    });
-    const { Product } = await response.json();
-    return Product;
+    })
+    if(response.ok) {
+      return await response.json();
+    } else {
+      throw new Error("get products response not ok");
+      
+    }
+    
   } catch (error) {
     console.error("getProduct error", error);
     return null;
@@ -43,7 +50,7 @@ export interface CreateProductInputData {
   register_date: Date
   price: number
   description: string
-  detail_images: string
+  detail_images: string[]
 }
 
 export async function createProduct(
@@ -58,7 +65,7 @@ export async function createProduct(
 
   try {
     // Authorized route. The access token has the userId in the JWT payload
-    const response = await fetch(`${process.env.API_URL}/products/new/`, {
+    const response = await fetch(`${process.env.API_URL}:8002/seller/product`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -87,9 +94,9 @@ export async function createProduct(
 
 export type CurrentProduct = Omit<Product, "password">
 export type CurrentProductName = Pick<Product, "product_name">
-export type SellersProducts = Omit<Product, "seller_id">
+export type SellersProduct = Omit<Product, "seller_id">
 export type ProductJson = {
-  sellers_products: SellersProducts[],
+  sellers_products: SellersProduct[],
   total_page: number,
   is_grouped: Boolean
 }

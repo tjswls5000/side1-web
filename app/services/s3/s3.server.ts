@@ -7,12 +7,12 @@ import { s3Bucket, s3Url } from "~/lib/s3"
 // S3
 const S3_CONFIG: aws.S3.ClientConfiguration = {
   signatureVersion: "v4",
-  region: "eu-central-1",
+  region: "ap-northeast-2",
   credentials:
     AWS_ACCESS_KEY_USER && AWS_SECRET_KEY_USER
       ? {
-          accessKeyId: AWS_ACCESS_KEY_USER,
-          secretAccessKey: AWS_SECRET_KEY_USER,
+          accessKeyId: "AKIAQUH3EHARPOWGDGMI",
+          secretAccessKey: "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",
         }
       : undefined,
 }

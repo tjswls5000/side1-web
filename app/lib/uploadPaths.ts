@@ -1,3 +1,3 @@
 export const UPLOAD_PATHS = {
-  userAvatar: (userId: string) => `users/${userId}/avatar`,
+  userAvatar: (userId: string) => `test_image/${userId}/products`,
 }

@@ -38,8 +38,8 @@ export const action: ActionFunction = async ({ request }) => {
       formError: `email/Password combination is incorrect`,
     });
   }
-  const { accessToken, refreshToken } = tokens;
-  return createAuthSession(accessToken, refreshToken, redirectTo as string);
+  const { access, refresh } = tokens;
+  return createAuthSession(access, refresh, redirectTo as string);
 }
 
 export default function Login() {

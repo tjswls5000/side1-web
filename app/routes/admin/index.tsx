@@ -1,8 +1,9 @@
 import * as c from "@chakra-ui/react"
 import { json, LoaderFunction } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
 
 import { Tile, TileBody, TileHeader, TileHeading } from "~/components/Tile"
-import { getUser } from "~/models/user.server";
+import { CurrentUserJson, getUser } from "~/models/user.server";
 import authenticated from "~/services/auth/authenticated.server";
 
 // export const loader = async ({ request }: LoaderArgs) => {
@@ -28,12 +29,9 @@ export const loader: LoaderFunction = async ({ request }) => {
   return authenticated(request, success, failure);
 };
 
-type LoaderData = {
-  userCount: number
-  postCount: number
-}
 export default function AdminIndex() {
   // const { userCount, postCount } = useLoaderData<LoaderData>()
+  const user = useLoaderData<CurrentUserJson>()
   return (
     <c.Stack spacing={4}>
       <c.Heading>관리자 메인 화면</c.Heading>
@@ -43,7 +41,7 @@ export default function AdminIndex() {
             <TileHeading>User count</TileHeading>
           </TileHeader>
           <TileBody>
-            <c.Text>111</c.Text>
+            <c.Text>{user.name}</c.Text>
           </TileBody>
         </Tile>
         <Tile>
